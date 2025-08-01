@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificador de IP</title>
+    <style>
+        * { box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { max-width: 600px; margin: 0 auto; padding: 20px; }
+        h1 { text-align: center; color: #333; }
+        input, button { width: 100%; padding: 12px; margin: 10px 0; font-size: 16px; }
+        button { background: #2188ff; color: white; border: none; cursor: pointer; }
+        #result { padding: 15px; margin-top: 20px; background: #f6f8fa; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Verificador de IP</h1>
+    <input 
+        type="text" 
+        id="domain" 
+        placeholder="Digite o domínio (ex: google.com)" 
+        autocomplete="off"
+    >
+    <button onclick="getIP()">Buscar IP</button>
+    <div id="result"></div>
+
+    <script>
+        async function getIP() {
+            const domain = document.getElementById('domain').value.trim();
+            const resultDiv = document.getElementById('result');
+            
+            if(!domain) {
+                resultDiv.textContent = "⚠️ Digite um domínio válido!";
+                return;
+            }
+
+            try {
+                resultDiv.textContent = "⏳ Buscando...";
+                
+                // Usando API pública de DNS
+                const response = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=A`);
+                const data = await response.json();
+                
+                if(data.Answer) {
+                    const ips = data.Answer.map(a => a.data);
+                    resultDiv.innerHTML = `<strong>IPs encontrados:</strong><br>${ips.join('<br>')}`;
+                } else {
+                    resultDiv.textContent = "❌ Nenhum IP encontrado!";
+                }
+            } catch(error) {
+                resultDiv.textContent = `🚫 Erro: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
